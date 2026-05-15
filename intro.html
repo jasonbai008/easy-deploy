@@ -237,11 +237,21 @@
         </p>
 
         <div class="button-group">
-            <a href="https://easy-deploy.pages.dev" target="_blank" class="btn btn-primary">立即开始</a>
+            <a href="javascript:void(0)" class="btn btn-primary" id="startBtn">立即开始</a>
             <a href="https://github.com/jasonbai008/easy-deploy" target="_blank" class="btn btn-outline">了解更多</a>
         </div>
 
     </main>
+
+    <script>
+        document.getElementById('startBtn').addEventListener('click', function() {
+            // 聚焦父页面的项目名称输入框
+            const parentInput = window.parent.document.querySelector('.input-text');
+            if (parentInput) {
+                parentInput.focus();
+            }
+        });
+    </script>
 
 </body>
 
