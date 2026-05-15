@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Easy Deploy - 网页快捷部署工具</title>
+    <link rel="shortcut icon" href="favicon.png" type="image/x-icon">
+    <style>
+        /* CSS 变量：亮色主题与 Cloudflare 品牌色 */
+        :root {
+            --cf-orange: #F38020;
+            --cf-orange-hover: #D76F19;
+            --cf-orange-light: rgba(243, 128, 32, 0.1);
+            --bg-color: #FAFAFB;
+            --text-title: #0F172A;
+            --text-body: #475569;
+            --grid-color: rgba(15, 23, 42, 0.04);
+        }
+
+        /* 基础重置：确保一屏展示，无滚动条 */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body,
+        html {
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: var(--bg-color);
+            position: relative;
+        }
+
+        /* 科技感网格背景 */
+        body::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(to right, var(--grid-color) 1px, transparent 1px),
+                linear-gradient(to bottom, var(--grid-color) 1px, transparent 1px);
+            background-size: 60px 60px;
+            mask-image: radial-gradient(circle at center, black 40%, transparent 100%);
+            -webkit-mask-image: radial-gradient(circle at center, black 40%, transparent 100%);
+            z-index: 1;
+        }
+
+        /* 氛围光晕（左上橙色，右下淡蓝） */
+        .glow {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(100px);
+            opacity: 0.4;
+            z-index: 0;
+        }
+
+        .glow-orange {
+            width: 600px;
+            height: 600px;
+            background: #F38020;
+            top: -200px;
+            left: -100px;
+        }
+
+        .glow-blue {
+            width: 500px;
+            height: 500px;
+            background: #3B82F6;
+            bottom: -150px;
+            right: -100px;
+            opacity: 0.15;
+        }
+
+        /* 核心布局容器：利用 Flexbox 居中并拉开间距 */
+        .hero-section {
+            position: relative;
+            z-index: 10;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 0 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* 图标设计 */
+        .icon-wrapper {
+            width: 96px;
+            height: 96px;
+            background: #FFFFFF;
+            border: 1px solid rgba(243, 128, 32, 0.2);
+            border-radius: 28px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 3rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 20px 40px -10px var(--cf-orange-light);
+        }
+
+        /* 英文标题 */
+        h1.title {
+            font-size: 5rem;
+            font-weight: 800;
+            color: var(--text-title);
+            letter-spacing: -2px;
+            margin-bottom: 1.5rem;
+            line-height: 1.1;
+        }
+
+        /* 标题中的渐变点缀 */
+        h1.title span {
+            background: linear-gradient(135deg, var(--cf-orange), #FF512F);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* 中文介绍内容：放宽行距，大气舒展 */
+        p.description {
+            font-size: 1.35rem;
+            line-height: 1.8;
+            color: var(--text-body);
+            max-width: 760px;
+            margin-bottom: 3.5rem;
+            font-weight: 400;
+        }
+
+        p.description strong {
+            color: var(--text-title);
+            font-weight: 600;
+            position: relative;
+        }
+
+        p.description strong::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: 2px;
+            width: 100%;
+            height: 4px;
+            background-color: var(--cf-orange-light);
+            z-index: -1;
+            transition: height 0.2s ease;
+        }
+
+        /* 按钮组 */
+        .button-group {
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        .btn {
+            padding: 1rem 2.5rem;
+            font-size: 1.15rem;
+            font-weight: 600;
+            border-radius: 12px;
+            text-decoration: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-primary {
+            background-color: var(--cf-orange);
+            color: #FFFFFF;
+            box-shadow: 0 10px 20px -5px rgba(243, 128, 32, 0.4);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--cf-orange-hover);
+            transform: translateY(-3px);
+            box-shadow: 0 15px 25px -5px rgba(243, 128, 32, 0.5);
+        }
+
+        .btn-outline {
+            background-color: #FFFFFF;
+            color: var(--text-title);
+            border: 1px solid #E2E8F0;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+
+        .btn-outline:hover {
+            border-color: #CBD5E1;
+            background-color: #F8FAFC;
+            transform: translateY(-3px);
+        }
+
+        /* 响应式适配：确保在较小屏幕上也不出现滚动条，自动缩放 */
+        @media (max-width: 768px) {
+            h1.title {
+                font-size: 3.5rem;
+            }
+
+            p.description {
+                font-size: 1.1rem;
+                margin-bottom: 2.5rem;
+            }
+
+            .button-group {
+                flex-direction: column;
+                width: 100%;
+                max-width: 320px;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- 背景光晕 -->
+    <div class="glow glow-orange"></div>
+    <div class="glow glow-blue"></div>
+
+    <!-- 落地页主体内容 -->
+    <main class="hero-section">
+
+        <div class="icon-wrapper">
+            🚀
+        </div>
+
+        <h1 class="title">Easy <span>Deploy</span></h1>
+
+        <p class="description">
+            Easy Deploy 是一个轻量级、直观的静态资源部署工具，旨在帮助开发者快速将 HTML 页面或整个文件夹部署到 <strong>Cloudflare</strong>
+        </p>
+
+        <div class="button-group">
+            <a href="https://easy-deploy.pages.dev" target="_blank" class="btn btn-primary">立即开始</a>
+            <a href="https://github.com/jasonbai008/easy-deploy" target="_blank" class="btn btn-outline">了解更多</a>
+        </div>
+
+    </main>
+
+</body>
+
+</html>
