@@ -301,11 +301,11 @@
             display: flex;
             align-items: center;
             gap: 6px;
-            padding: 8px 16px;
+            padding: 6px 16px;
             background-color: var(--cf-orange);
             border: 1px solid var(--cf-orange);
             border-radius: 6px;
-            font-size: 13px;
+            font-size: 14px;
             font-weight: 600;
             color: white;
             text-decoration: none;
@@ -387,7 +387,7 @@
                 <div class="upload-grid">
                     <button @click="$refs.fileInput.click()" class="upload-btn">
                         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
-                        <span>上传单文件</span>
+                        <span>上传HTML</span>
                     </button>
                     <button @click="$refs.folderInput.click()" class="upload-btn">
                         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path></svg>
@@ -413,7 +413,8 @@
 
             <!-- 部署按钮 -->
             <button @click="deploy" :disabled="isUploading || !projectName || files.length === 0" class="deploy-btn">
-                {{ isUploading ? '正在部署 ' + uploadProgress + '%' : '开始部署' }}
+                <span v-if="isUploading" class="spinner"></span>
+                {{ isUploading ? '正在部署...' : '开始部署' }}
             </button>
         </div>
 
@@ -486,14 +487,19 @@
                         formData.append('projectName', this.projectName);
                         
                         this.files.forEach(file => {
-                            const path = file.webkitRelativePath || file.name;
+                            let path = file.name;
+                            // 如果是文件夹上传，剥离第一层文件夹名
+                            if (file.webkitRelativePath) {
+                                const parts = file.webkitRelativePath.split('/');
+                                if (parts.length > 1) {
+                                    path = parts.slice(1).join('/');
+                                } else {
+                                    path = file.webkitRelativePath;
+                                }
+                            }
                             formData.append('files', file, path);
                         });
 
-                        // Fetch API 本身不支持直接获取上传进度，
-                        // 但对于普通文件上传，我们可以使用 XMLHttpRequest 来模拟进度，
-                        // 或者简单地在 fetch 完成后设置为 100%
-                        
                         const response = await fetch('/upload', {
                             method: 'POST',
                             body: formData
@@ -504,13 +510,24 @@
                         if (result.success) {
                             this.uploadProgress = 100;
                             
-                            // 查找主页面
+                            // 查找主页面 (index.html 或唯一的 html 文件)
                             let mainFile = 'index.html';
-                            const htmlFiles = this.files.filter(f => f.name.endsWith('.html'));
-                            if (htmlFiles.length === 1) {
-                                mainFile = htmlFiles[0].name;
-                            } else if (this.files.length === 1) {
-                                mainFile = this.files[0].name;
+                            
+                            // 优先检查是否存在 index.html (剥离路径后)
+                            const hasIndexHtml = this.files.some(file => {
+                                let path = file.name;
+                                if (file.webkitRelativePath) {
+                                    const parts = file.webkitRelativePath.split('/');
+                                    path = parts.length > 1 ? parts.slice(1).join('/') : file.webkitRelativePath;
+                                }
+                                return path === 'index.html';
+                            });
+
+                            if (!hasIndexHtml) {
+                                const htmlFiles = this.files.filter(f => f.name.endsWith('.html'));
+                                if (htmlFiles.length === 1) {
+                                    mainFile = htmlFiles[0].name;
+                                }
                             }
                             
                             this.previewUrl = `https://asset.jasonbai.dpdns.org/app/${this.projectName}/${mainFile}`;
