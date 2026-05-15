@@ -489,10 +489,14 @@
                  * @param {Event} event 
                  */
                 handleFiles(event) {
+                    const MAX_SIZE = 10 * 1024 * 1024; // 10MB
                     const selectedFiles = Array.from(event.target.files).filter(file => {
                         const path = file.webkitRelativePath || file.name;
                         // 检查路径中是否包含 .git 文件夹
-                        return !path.split('/').includes('.git');
+                        const isGit = path.split('/').includes('.git');
+                        // 检查文件大小是否超过 10MB
+                        const isOverSize = file.size > MAX_SIZE;
+                        return !isGit && !isOverSize;
                     });
 
                     // 如果过滤后仍有有效文件，则更新待上传列表
@@ -500,6 +504,9 @@
                         this.files = selectedFiles;
                         this.previewUrl = ''; 
                     }
+                    
+                    // 重置 input，允许重复选择相同文件
+                    event.target.value = '';
                 },
                 
                 /**
