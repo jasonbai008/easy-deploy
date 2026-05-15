@@ -489,7 +489,13 @@
                  * @param {Event} event 
                  */
                 handleFiles(event) {
-                    const selectedFiles = Array.from(event.target.files);
+                    const selectedFiles = Array.from(event.target.files).filter(file => {
+                        const path = file.webkitRelativePath || file.name;
+                        // 检查路径中是否包含 .git 文件夹
+                        return !path.split('/').includes('.git');
+                    });
+
+                    // 如果过滤后仍有有效文件，则更新待上传列表
                     if (selectedFiles.length > 0) {
                         this.files = selectedFiles;
                         this.previewUrl = ''; 
