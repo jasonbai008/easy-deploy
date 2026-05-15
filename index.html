@@ -302,20 +302,33 @@
             align-items: center;
             gap: 6px;
             padding: 8px 16px;
-            background-color: var(--white);
-            border: 1px solid var(--border-color);
+            background-color: var(--cf-orange);
+            border: 1px solid var(--cf-orange);
             border-radius: 6px;
             font-size: 13px;
-            font-weight: 500;
-            color: var(--text-secondary);
+            font-weight: 600;
+            color: white;
             text-decoration: none;
             transition: all 0.2s;
+            cursor: pointer;
         }
 
         .external-btn:hover {
-            background-color: #f9f9f9;
-            border-color: #999;
-            color: var(--text-main);
+            background-color: var(--cf-orange-hover);
+            border-color: var(--cf-orange-hover);
+            color: white;
+            box-shadow: 0 2px 4px rgba(246, 130, 31, 0.2);
+        }
+
+        .external-btn.secondary {
+            background-color: white;
+            color: var(--cf-orange);
+            border: 1px solid var(--cf-orange);
+        }
+
+        .external-btn.secondary:hover {
+            background-color: rgba(246, 130, 31, 0.05);
+            color: var(--cf-orange-hover);
         }
 
         .iframe-container {
@@ -402,17 +415,6 @@
             <button @click="deploy" :disabled="isUploading || !projectName || files.length === 0" class="deploy-btn">
                 {{ isUploading ? '正在部署 ' + uploadProgress + '%' : '开始部署' }}
             </button>
-
-            <!-- Step 3: 预览链接 -->
-            <div v-if="previewUrl" class="preview-link-section">
-                <label class="step-label">Step 3: 预览链接</label>
-                <div class="link-box">
-                    <input :value="previewUrl" readonly class="link-input">
-                    <button @click="copyLink" class="icon-btn" title="复制链接">
-                        <svg style="width:16px;height:16px" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path></svg>
-                    </button>
-                </div>
-            </div>
         </div>
 
         <!-- 右侧预览区域 -->
@@ -426,10 +428,16 @@
                 <div class="address-bar">
                     {{ previewUrl || '等待部署...' }}
                 </div>
-                <a v-if="previewUrl" :href="previewUrl" target="_blank" class="external-btn">
-                    <span>新标签页打开</span>
-                    <svg style="width:14px;height:14px" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
-                </a>
+                <div v-if="previewUrl" style="display: flex; gap: 8px;">
+                    <button @click="copyLink" class="external-btn secondary">
+                        <svg style="width:14px;height:14px" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path></svg>
+                        <span>复制</span>
+                    </button>
+                    <a :href="previewUrl" target="_blank" class="external-btn">
+                        <span>打开</span>
+                        <svg style="width:14px;height:14px" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+                    </a>
+                </div>
             </div>
             <div class="iframe-container">
                 <iframe v-if="previewUrl" :src="previewUrl"></iframe>
@@ -507,6 +515,9 @@
                             
                             this.previewUrl = `https://asset.jasonbai.dpdns.org/app/${this.projectName}/${mainFile}`;
                             alert('部署成功！');
+                            
+                            // 部署成功后清除已上传的文件
+                            this.files = [];
                         } else {
                             throw new Error(result.message || '上传失败');
                         }
