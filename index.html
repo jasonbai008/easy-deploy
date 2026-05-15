@@ -295,6 +295,26 @@
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .refresh-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #999;
+            display: flex;
+            align-items: center;
+            padding: 2px;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+
+        .refresh-btn:hover {
+            color: var(--cf-orange);
+            background-color: rgba(246, 130, 31, 0.1);
         }
 
         .external-btn {
@@ -427,7 +447,10 @@
                     <div class="dot green"></div>
                 </div>
                 <div class="address-bar">
-                    {{ previewUrl || '等待部署...' }}
+                    <span>{{ previewUrl || '等待部署...' }}</span>
+                    <button v-if="previewUrl" @click="refreshPreview" class="refresh-btn" title="刷新预览">
+                        <svg style="width:16px;height:16px" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                    </button>
                 </div>
                 <div v-if="previewUrl" style="display: flex; gap: 8px;">
                     <button @click="copyLink" class="external-btn secondary">
@@ -487,16 +510,8 @@
                         formData.append('projectName', this.projectName);
                         
                         this.files.forEach(file => {
-                            let path = file.name;
-                            // 如果是文件夹上传，剥离第一层文件夹名
-                            if (file.webkitRelativePath) {
-                                const parts = file.webkitRelativePath.split('/');
-                                if (parts.length > 1) {
-                                    path = parts.slice(1).join('/');
-                                } else {
-                                    path = file.webkitRelativePath;
-                                }
-                            }
+                            // 使用完整路径，不剥离用户文件夹名称
+                            const path = file.webkitRelativePath || file.name;
                             formData.append('files', file, path);
                         });
 
@@ -510,23 +525,24 @@
                         if (result.success) {
                             this.uploadProgress = 100;
                             
-                            // 查找主页面 (index.html 或唯一的 html 文件)
-                            let mainFile = 'index.html';
+                            // 查找主页面
+                            let mainFile = '';
                             
-                            // 优先检查是否存在 index.html (剥离路径后)
-                            const hasIndexHtml = this.files.some(file => {
-                                let path = file.name;
-                                if (file.webkitRelativePath) {
-                                    const parts = file.webkitRelativePath.split('/');
-                                    path = parts.length > 1 ? parts.slice(1).join('/') : file.webkitRelativePath;
-                                }
-                                return path === 'index.html';
+                            // 优先在所有文件中寻找 index.html
+                            const indexFile = this.files.find(f => {
+                                const path = f.webkitRelativePath || f.name;
+                                return path.endsWith('index.html');
                             });
 
-                            if (!hasIndexHtml) {
-                                const htmlFiles = this.files.filter(f => f.name.endsWith('.html'));
-                                if (htmlFiles.length === 1) {
-                                    mainFile = htmlFiles[0].name;
+                            if (indexFile) {
+                                mainFile = indexFile.webkitRelativePath || indexFile.name;
+                            } else {
+                                // 否则找第一个 html 文件
+                                const firstHtml = this.files.find(f => f.name.endsWith('.html'));
+                                if (firstHtml) {
+                                    mainFile = firstHtml.webkitRelativePath || firstHtml.name;
+                                } else if (this.files.length === 1) {
+                                    mainFile = this.files[0].name;
                                 }
                             }
                             
@@ -553,6 +569,20 @@
                     navigator.clipboard.writeText(this.previewUrl).then(() => {
                         alert('链接已复制到剪贴板');
                     });
+                },
+
+                /**
+                 * 刷新预览页面
+                 */
+                refreshPreview() {
+                    const iframe = this.$el.querySelector('iframe');
+                    if (iframe) {
+                        const oldSrc = iframe.src;
+                        iframe.src = 'about:blank';
+                        setTimeout(() => {
+                            iframe.src = oldSrc;
+                        }, 50);
+                    }
                 }
             }
         });
