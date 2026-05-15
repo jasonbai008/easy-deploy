@@ -86,10 +86,10 @@
 
         .step-label {
             display: block;
-            font-size: 13px;
+            font-size: 15px;
             font-weight: 600;
             color: var(--cf-orange);
-            margin-bottom: 8px;
+            margin-bottom: 12px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
@@ -331,6 +331,7 @@
             text-decoration: none;
             transition: all 0.2s;
             cursor: pointer;
+            line-height: 20px;
         }
 
         .external-btn:hover {
@@ -398,7 +399,7 @@
             <!-- Step 1: 项目名称 -->
             <div class="step-section">
                 <label class="step-label">Step 1: 输入项目名称</label>
-                <input v-model="projectName" type="text" placeholder="例如: my-awesome-app" class="input-text">
+                <input v-model="projectName" type="text" placeholder="例如: bai" class="input-text">
             </div>
 
             <!-- Step 2: 上传按钮 -->
@@ -454,19 +455,18 @@
                 </div>
                 <div v-if="previewUrl" style="display: flex; gap: 8px;">
                     <button @click="copyLink" class="external-btn secondary">
-                        <svg style="width:14px;height:14px" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path></svg>
+                        <svg t="1778832043668" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="12307" width="18" height="18"><path d="M761.088 715.3152a38.7072 38.7072 0 0 1 0-77.4144 37.4272 37.4272 0 0 0 37.4272-37.4272V265.0112a37.4272 37.4272 0 0 0-37.4272-37.4272H425.6256a37.4272 37.4272 0 0 0-37.4272 37.4272 38.7072 38.7072 0 1 1-77.4144 0 115.0976 115.0976 0 0 1 114.8416-114.8416h335.4624a115.0976 115.0976 0 0 1 114.8416 114.8416v335.4624a115.0976 115.0976 0 0 1-114.8416 114.8416z" p-id="12308" fill="#f6821f"></path><path d="M589.4656 883.0976H268.1856a121.1392 121.1392 0 0 1-121.2928-121.2928v-322.56a121.1392 121.1392 0 0 1 121.2928-121.344h321.28a121.1392 121.1392 0 0 1 121.2928 121.2928v322.56c1.28 67.1232-54.1696 121.344-121.2928 121.344zM268.1856 395.3152a43.52 43.52 0 0 0-43.8784 43.8784v322.56a43.52 43.52 0 0 0 43.8784 43.8784h321.28a43.52 43.52 0 0 0 43.8784-43.8784v-322.56a43.52 43.52 0 0 0-43.8784-43.8784z" p-id="12309" fill="#f6821f"></path></svg>
                         <span>复制</span>
                     </button>
                     <a :href="previewUrl" target="_blank" class="external-btn">
                         <span>打开</span>
-                        <svg style="width:14px;height:14px" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+                        <svg t="1778832232706" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="19656" width="12" height="12"><path d="M910.21312 910.21312H113.78688V113.78688h201.29792V0h-201.3184A113.78688 113.78688 0 0 0 0 113.78688v796.42624A113.78688 113.78688 0 0 0 113.78688 1024h796.42624A113.78688 113.78688 0 0 0 1024 910.21312v-201.29792h-113.78688v201.3184zM625.78688 0v113.78688h203.93984L270.49984 672.9728l80.4864 80.4864L910.2336 194.29376v203.93984H1024V0H625.78688z" fill="#ffffff" p-id="19657"></path></svg>
                     </a>
                 </div>
             </div>
             <div class="iframe-container">
                 <iframe v-if="previewUrl" :src="previewUrl"></iframe>
                 <div v-else class="empty-preview">
-                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
                     <p>部署完成后在此处预览</p>
                 </div>
             </div>
